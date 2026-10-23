@@ -1,0 +1,546 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ property.name }} — Luxury Suites & Serviced Residences{% endblock %}
+
+{% block content %}
+<div x-data="bookingApp()">
+
+  <!-- 1. HERO SECTION -->
+  <section class="relative min-h-[580px] lg:min-h-[760px] flex items-center justify-center text-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 overflow-hidden">
+    <!-- Hero Image Canvas with Gentle Warm Overlay -->
+    <div class="absolute inset-0 z-0">
+      <img src="{{ property.hero_image }}" alt="{{ property.name }}" class="w-full h-full object-cover object-center scale-100 filter brightness-[0.65]">
+      <div class="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-stone-900/30 to-stone-950/40"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-4xl mx-auto pt-4 sm:pt-6 text-white">
+      
+      <span class="inline-block text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] sm:tracking-[0.3em] uppercase text-stone-200 mb-4 sm:mb-6 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md">
+        Boutique Serviced Residences
+      </span>
+
+      <h1 class="font-serif text-3xl sm:text-5xl lg:text-7xl font-normal leading-[1.2] sm:leading-[1.15] tracking-tight max-w-3xl mx-auto">
+        {{ property.hero_title }}
+      </h1>
+
+      <p class="text-stone-200 text-xs sm:text-base md:text-lg max-w-2xl mx-auto mt-4 sm:mt-6 leading-relaxed font-light px-2 sm:px-0">
+        {{ property.hero_subtitle }}
+      </p>
+
+      <!-- STREAMLINED AVAILABILITY / SEARCH CAPSULE -->
+      <div class="w-full max-w-3xl mx-auto mt-8 sm:mt-12 bg-white/95 backdrop-blur-md rounded-2xl md:rounded-full p-2.5 sm:p-3 shadow-2xl border border-white/40 text-left text-stone-800">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
+          
+          <!-- Check In -->
+          <div class="lg:col-span-3 px-4 py-2 border-b sm:border-b-0 sm:border-r border-stone-200">
+            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest">Check-in</label>
+            <input type="date" x-model="checkInDate" class="bg-transparent text-xs sm:text-sm text-stone-900 focus:outline-none w-full font-medium cursor-pointer">
+          </div>
+
+          <!-- Check Out -->
+          <div class="lg:col-span-3 px-4 py-2 border-b sm:border-b-0 lg:border-r border-stone-200">
+            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest">Check-out</label>
+            <input type="date" x-model="checkOutDate" class="bg-transparent text-xs sm:text-sm text-stone-900 focus:outline-none w-full font-medium cursor-pointer">
+          </div>
+
+          <!-- Preferred Suite -->
+          <div class="lg:col-span-3 px-4 py-2">
+            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest">Suite</label>
+            <select x-model="selectedSuite" class="bg-transparent text-xs sm:text-sm text-stone-900 focus:outline-none w-full font-medium cursor-pointer truncate">
+              <option value="">Any Available Suite</option>
+              {% for s in suites %}
+                <option value="{{ s.title }}">{{ s.title }} (GH₵{{ s.nightly_rate|floatformat:0 }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Action Button -->
+          <div class="lg:col-span-3 w-full">
+            <button @click="openWhatsAppWithDates()" type="button" class="w-full bg-stone-900 hover:bg-stone-800 text-stone-50 font-medium py-3 px-4 rounded-xl md:rounded-full text-xs uppercase tracking-wider transition-colors duration-200 flex items-center justify-center gap-1.5 shadow-md">
+              <span>Check Rates</span>
+              <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Understated Reassurance -->
+      <div class="mt-5 flex flex-wrap justify-center items-center gap-6 text-xs text-stone-300 font-light">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Direct Host Reservation
+        </span>
+        <span class="text-stone-500">•</span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Zero Booking Fees
+        </span>
+        <span class="text-stone-500">•</span>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Concierge Support
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 2. EDITORIAL PILLARS / PHILOSOPHY -->
+  <section class="py-14 sm:py-20 px-4 sm:px-6 lg:px-8 border-b border-stone-200/80 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
+        
+        <div class="space-y-3">
+          <span class="text-[10px] tracking-[0.25em] uppercase text-stone-400 font-semibold block">01 / Serenity</span>
+          <h3 class="font-serif text-xl sm:text-2xl font-normal text-stone-900">Quiet Architectural Living</h3>
+          <p class="text-stone-500 text-sm leading-relaxed font-light">
+            Each suite is furnished with natural materials, soundproof glazing, and expansive private balconies designed to offer a peaceful haven away from the city pulse.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <span class="text-[10px] tracking-[0.25em] uppercase text-stone-400 font-semibold block">02 / Connectivity</span>
+          <h3 class="font-serif text-xl sm:text-2xl font-normal text-stone-900">Work & Leisure Balance</h3>
+          <p class="text-stone-500 text-sm leading-relaxed font-light">
+            Equipped with 300 Mbps symmetrical fiber internet, dedicated desks, and smart entertainment systems for both executive workdays and slow weekend mornings.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <span class="text-[10px] tracking-[0.25em] uppercase text-stone-400 font-semibold block">03 / Hospitality</span>
+          <h3 class="font-serif text-xl sm:text-2xl font-normal text-stone-900">Direct Concierge Care</h3>
+          <p class="text-stone-500 text-sm leading-relaxed font-light">
+            Skip automated call centers and intermediary commissions. You interact directly with our on-site hosts for custom arrival times, housekeeping, and local arrangements.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SUITES & ACCOMMODATIONS (EDITORIAL CARD SHOWCASE) -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" id="suites">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div>
+        <span class="text-[11px] uppercase tracking-[0.25em] text-stone-400 font-semibold block mb-2">Accommodations</span>
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-900 tracking-tight">Our Living Suites</h2>
+      </div>
+      <p class="text-stone-500 text-sm max-w-md font-light leading-relaxed">
+        Thoughtfully designed spaces pairing private residence comforts with personalized hospitality. Select any unit to view full details and direct pricing.
+      </p>
+    </div>
+
+    <!-- Editorial Suites Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {% for suite in suites %}
+        <div class="group flex flex-col bg-white rounded-2xl overflow-hidden border border-stone-200/80 hover:border-stone-400 transition-all duration-300">
+          
+          <!-- Image Container with Aspect Ratio -->
+          <a href="{% url 'suite_detail' suite.slug %}" class="relative aspect-[16/10] overflow-hidden block bg-stone-100">
+            <img src="{{ suite.cover_image }}" alt="{{ suite.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+            
+            {% if suite.badge %}
+              <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-stone-800 text-[10px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full shadow-sm">
+                {{ suite.badge }}
+              </div>
+            {% endif %}
+
+            <div class="absolute bottom-4 right-4 bg-stone-900/80 backdrop-blur-md text-stone-50 text-xs font-medium px-3 py-1 rounded-full">
+              GH₵{{ suite.nightly_rate|floatformat:0 }} <span class="text-stone-300 text-[10px] font-light">/ night</span>
+            </div>
+          </a>
+
+          <!-- Suite Details -->
+          <div class="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-5">
+            <div>
+              <span class="text-[11px] tracking-widest uppercase text-stone-400 font-medium block mb-1">
+                {{ suite.unit_type }}
+              </span>
+              <h3 class="font-serif text-2xl font-normal text-stone-900 group-hover:text-stone-600 transition-colors">
+                <a href="{% url 'suite_detail' suite.slug %}">{{ suite.title }}</a>
+              </h3>
+              
+              <p class="text-xs text-stone-500 mt-2.5 font-light leading-relaxed line-clamp-2">
+                {{ suite.short_description }}
+              </p>
+
+              <!-- Editorial Spec Line (Clean Typography Instead of Table) -->
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500 font-light pt-4 mt-4 border-t border-stone-100">
+                <span>{{ suite.max_guests }} Guests</span>
+                <span class="text-stone-300">•</span>
+                <span>{{ suite.bedrooms }} Bed{% if suite.bedrooms > 1 %}s{% endif %}</span>
+                <span class="text-stone-300">•</span>
+                <span>{{ suite.bathrooms }} Bath</span>
+                <span class="text-stone-300">•</span>
+                <span>{{ suite.size_sqm }} m²</span>
+              </div>
+            </div>
+
+            <!-- Single Refined Action Row -->
+            <div class="pt-3 flex items-center justify-between gap-2 border-t border-stone-100">
+              <a href="{% url 'suite_detail' suite.slug %}" class="text-xs font-semibold tracking-wider uppercase text-stone-900 hover:text-stone-600 flex items-center gap-1.5 transition-colors py-1">
+                <span>View Suite Details</span>
+                <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+
+              <button @click="inquireOnWhatsApp('{{ suite.title }}')" class="text-xs font-medium text-stone-700 hover:text-stone-950 bg-stone-50 hover:bg-stone-100 border border-stone-200/80 py-1.5 px-3 rounded-full transition-colors shrink-0" title="Quick WhatsApp Inquiry">
+                WhatsApp Host
+              </button>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- 4. REFINED AMENITIES (HAIRLINE ICONS, NO EMOJIS) -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 border-y border-stone-200/80 bg-white" id="amenities">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-[11px] uppercase tracking-[0.25em] text-stone-400 font-semibold block mb-2">Modern Comforts</span>
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-900 tracking-tight">Included Amenities</h2>
+        <p class="text-stone-500 text-sm mt-3 font-light leading-relaxed">
+          Every element has been curated to support a seamless, elevated stay.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+        {% for amenity in amenities %}
+          <div class="flex items-start gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-xl hover:bg-stone-50/80 transition-colors border border-stone-100 sm:border-transparent">
+            <!-- Minimal Hairline SVG Icons based on amenity.icon_name -->
+            <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-800 shrink-0">
+              {% if 'wifi' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+              {% elif 'pool' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2m-20 4c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M3 11c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>
+              {% elif 'snowflake' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m9-9H3m15.364-6.364l-12.728 12.728m0-12.728l12.728 12.728"/></svg>
+              {% elif 'shield' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              {% elif 'car' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v9c0 .6.4 1 1 1h2m12 0a2 2 0 100-4 2 2 0 000 4zm-12 0a2 2 0 100-4 2 2 0 000 4z"/></svg>
+              {% elif 'kitchen' in amenity.icon_name or 'coffee' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              {% elif 'tv' in amenity.icon_name %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              {% else %}
+                <svg class="w-5 h-5 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              {% endif %}
+            </div>
+
+            <div>
+              <h4 class="text-sm font-medium text-stone-900">{{ amenity.name }}</h4>
+              {% if amenity.description %}
+                <p class="text-xs text-stone-500 font-light mt-0.5 leading-relaxed">{{ amenity.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5. CURATED PHOTO GALLERY -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" id="gallery">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div>
+        <span class="text-[11px] uppercase tracking-[0.25em] text-stone-400 font-semibold block mb-2">Visual Tour</span>
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-900 tracking-tight">Spaces & Architecture</h2>
+      </div>
+      <p class="text-stone-500 text-sm max-w-md font-light leading-relaxed">
+        Preview the light-filled interiors, master suites, chef-grade kitchens, and rooftop relaxation areas.
+      </p>
+    </div>
+
+    <!-- Minimal Gallery Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 group">
+        <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80" alt="Building Architecture" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-stone-950/20 group-hover:bg-stone-950/40 transition-colors flex items-end p-5">
+          <span class="text-xs text-white font-medium">Residence Architecture & Exterior</span>
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 group">
+        <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80" alt="Living Room" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-stone-950/20 group-hover:bg-stone-950/40 transition-colors flex items-end p-5">
+          <span class="text-xs text-white font-medium">Open-Plan Living & Dining Space</span>
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 group">
+        <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80" alt="Master Bedroom" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-stone-950/20 group-hover:bg-stone-950/40 transition-colors flex items-end p-5">
+          <span class="text-xs text-white font-medium">Master Suite with King Linen Bedding</span>
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 group">
+        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80" alt="Spa Bathroom" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-stone-950/20 group-hover:bg-stone-950/40 transition-colors flex items-end p-5">
+          <span class="text-xs text-white font-medium">Spa-Style Bathroom with Rain Shower</span>
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 group">
+        <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1000&q=80" alt="Kitchen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-stone-950/20 group-hover:bg-stone-950/40 transition-colors flex items-end p-5">
+          <span class="text-xs text-white font-medium">Fully Equipped Chef's Kitchen</span>
+        </div>
+      </div>
+
+      <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 group">
+        <img src="https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1000&q=80" alt="Pool" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <div class="absolute inset-0 bg-stone-950/20 group-hover:bg-stone-950/40 transition-colors flex items-end p-5">
+          <span class="text-xs text-white font-medium">Rooftop Horizon Pool & Sundeck</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 6. RESERVATION & CONCIERGE INQUIRY -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 border-t border-stone-200/80 bg-white" id="inquiry-section">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+      
+      <!-- Left Column: Concierge Desk Info -->
+      <div class="lg:col-span-5 space-y-6">
+        <div>
+          <span class="text-[11px] uppercase tracking-[0.25em] text-stone-400 font-semibold block mb-2">Private Concierge</span>
+          <h2 class="font-serif text-3xl sm:text-4xl font-normal text-stone-900 tracking-tight">Request a Reservation</h2>
+          <p class="text-stone-500 text-sm mt-3 leading-relaxed font-light">
+            Submit your intended travel dates and suite preference. Our concierge will review availability and contact you promptly with confirmation and direct payment options.
+          </p>
+        </div>
+
+        <div class="space-y-4 pt-4 border-t border-stone-100">
+          <div class="flex items-start gap-3.5">
+            <div class="w-5 h-5 rounded-full bg-stone-100 text-stone-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">✓</div>
+            <div>
+              <div class="text-xs font-semibold text-stone-900">Guaranteed Best Rate</div>
+              <div class="text-xs text-stone-500 font-light mt-0.5">Booking direct saves up to 20% compared to third-party travel platforms.</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3.5">
+            <div class="w-5 h-5 rounded-full bg-stone-100 text-stone-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">✓</div>
+            <div>
+              <div class="text-xs font-semibold text-stone-900">Zero Upfront Credit Card Needed</div>
+              <div class="text-xs text-stone-500 font-light mt-0.5">Lock in dates first; finalize deposit or on-arrival settlement directly with the host.</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3.5">
+            <div class="w-5 h-5 rounded-full bg-stone-100 text-stone-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">✓</div>
+            <div>
+              <div class="text-xs font-semibold text-stone-900">Personalized Requests</div>
+              <div class="text-xs text-stone-500 font-light mt-0.5">Early check-in, late departures, and airport transport coordinated directly.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Contact Box -->
+        <div class="p-6 rounded-2xl bg-brand-cream border border-stone-200/80 space-y-2 mt-6">
+          <div class="text-xs text-stone-500 font-medium">Prefer instant messaging?</div>
+          <a href="https://wa.me/{{ property.whatsapp_number }}" target="_blank" class="text-sm font-semibold text-stone-900 hover:text-stone-700 flex items-center gap-2">
+            <span>Direct WhatsApp Desk: +{{ property.whatsapp_number }} →</span>
+          </a>
+          <div class="text-[11px] text-stone-400 font-light">Direct desk available daily for guest support.</div>
+        </div>
+      </div>
+
+      <!-- Right Column: Minimal Form -->
+      <div class="lg:col-span-7 bg-white border border-stone-200 rounded-3xl p-5 sm:p-8 md:p-10 shadow-sm">
+        
+        <h3 class="font-serif text-2xl font-normal text-stone-900">Check Availability</h3>
+        <p class="text-xs text-stone-500 font-light mt-1 mb-8">Fill out your details below and our concierge team will respond shortly.</p>
+
+        <!-- Dynamic Success Alert (Shown via AJAX) -->
+        <div x-show="formSubmitted" x-cloak class="mb-6 p-6 bg-stone-900 text-stone-50 rounded-2xl text-center space-y-3">
+          <div class="text-xl">✨</div>
+          <div class="text-base font-serif" x-text="successMessage"></div>
+          <p class="text-xs text-stone-300 font-light">Your inquiry is logged. Please expect a message from our host team shortly.</p>
+          <div class="pt-2">
+            <button @click="formSubmitted = false" class="text-xs text-stone-300 underline hover:text-white">Submit another request</button>
+          </div>
+        </div>
+
+        <!-- The Django Form -->
+        <form x-show="!formSubmitted" @submit.prevent="submitInquiry($event)" method="POST" action="{% url 'inquiry_submit' %}" class="space-y-4">
+          {% csrf_token %}
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Full Name *</label>
+              {{ form.guest_name }}
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Phone or WhatsApp *</label>
+              {{ form.guest_phone }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Check-in Date *</label>
+              {{ form.check_in_date }}
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Check-out Date *</label>
+              {{ form.check_out_date }}
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Guests *</label>
+              {{ form.number_of_guests }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Email (Optional)</label>
+              {{ form.guest_email }}
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-stone-700 mb-1.5">Preferred Suite</label>
+              {{ form.preferred_unit }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-stone-700 mb-1.5">Special Requests or Questions</label>
+            {{ form.special_notes }}
+          </div>
+
+          <button type="submit" :disabled="submitting" class="w-full bg-stone-900 hover:bg-stone-800 disabled:opacity-50 text-stone-50 font-medium py-3.5 rounded-full text-xs uppercase tracking-wider transition-all duration-200 mt-2">
+            <span x-show="!submitting">Submit Reservation Request</span>
+            <span x-show="submitting" x-cloak>Logging your request...</span>
+          </button>
+
+          <p class="text-[11px] text-center text-stone-400 font-light pt-2">
+            By submitting, you agree to receive a callback or message from our host team regarding your stay.
+          </p>
+        </form>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 7. LOCATION & NEIGHBORHOOD -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" id="location">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <div class="lg:col-span-6 space-y-5">
+        <span class="text-[11px] uppercase tracking-[0.25em] text-stone-400 font-semibold block">Neighborhood</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-normal text-stone-900 tracking-tight">Prime Apenkwa Setting</h2>
+        <p class="text-stone-500 text-sm leading-relaxed font-light">
+          Situated at {{ property.address }}, {{ property.city }}. Enjoy peace, privacy, and refreshing hillside air with swift access to central Koforidua's dining, commercial centers, and scenic Eastern Region landmarks.
+        </p>
+
+        <div class="space-y-3 pt-3">
+          <div class="flex items-center justify-between text-xs text-stone-700 py-3 border-b border-stone-200/80">
+            <span class="font-medium text-stone-900">Central Koforidua & Jackson Park</span>
+            <span class="text-stone-400 font-light">6 minutes drive</span>
+          </div>
+          <div class="flex items-center justify-between text-xs text-stone-700 py-3 border-b border-stone-200/80">
+            <span class="font-medium text-stone-900">Local Markets & Dining</span>
+            <span class="text-stone-400 font-light">5 minutes drive</span>
+          </div>
+          <div class="flex items-center justify-between text-xs text-stone-700 py-3 border-b border-stone-200/80">
+            <span class="font-medium text-stone-900">Scenic Excursions (Boti Falls & Umbrella Rock)</span>
+            <span class="text-stone-400 font-light">30 minutes drive</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Minimal Map Card -->
+      <div class="lg:col-span-6 rounded-3xl overflow-hidden border border-stone-200 bg-white shadow-sm h-80 relative flex items-center justify-center text-center p-8">
+        <div class="space-y-4 max-w-md">
+          <span class="text-xs uppercase tracking-widest text-stone-400 font-semibold block">Location</span>
+          <h4 class="font-serif text-2xl font-normal text-stone-900">{{ property.name }}</h4>
+          <p class="text-xs text-stone-500 font-light">{{ property.address }}, {{ property.city }}</p>
+          <div class="pt-2">
+            <a href="https://maps.google.com/?q={{ property.address|urlencode }}+{{ property.city|urlencode }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-900 hover:text-stone-600 border-b border-stone-900 pb-0.5 transition-colors">
+              <span>Open in Google Maps →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+function bookingApp() {
+  const now = new Date();
+  const d1 = new Date(); d1.setDate(now.getDate() + 2);
+  const d2 = new Date(); d2.setDate(now.getDate() + 5);
+
+  return {
+    checkInDate: d1.toISOString().split('T')[0],
+    checkOutDate: d2.toISOString().split('T')[0],
+    selectedSuite: '',
+    submitting: false,
+    formSubmitted: false,
+    successMessage: '',
+
+    openWhatsAppWithDates() {
+      const suite = this.selectedSuite || 'a suite';
+      const phone = '{{ property.whatsapp_number }}'.replace(/\D/g, '');
+      const msg = encodeURIComponent(`Hello {{ property.name }}, I would like to inquire about reserving ${suite} from ${this.checkInDate} to ${this.checkOutDate}. Could you confirm availability?`);
+      window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    },
+
+    inquireOnWhatsApp(suiteTitle) {
+      const phone = '{{ property.whatsapp_number }}'.replace(/\D/g, '');
+      const msg = encodeURIComponent(`Hello {{ property.name }}, I am interested in reserving "${suiteTitle}". Could you please let me know availability and pricing?`);
+      window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    },
+
+    scrollToForm() {
+      const el = document.getElementById('inquiry-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+
+    async submitInquiry(e) {
+      this.submitting = true;
+      const form = e.target;
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'x-requested-with': 'XMLHttpRequest',
+          }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          this.formSubmitted = true;
+          this.successMessage = data.message;
+          form.reset();
+        } else {
+          alert(data.message || 'Please check the form inputs.');
+        }
+      } catch (err) {
+        form.submit();
+      } finally {
+        this.submitting = false;
+      }
+    }
+  }
+}
+</script>
+{% endblock %}

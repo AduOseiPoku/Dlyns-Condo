@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ suite.title }} — {{ property.name }}{% endblock %}
+
+{% block content %}
+<div class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" x-data="{ activeImage: '{{ suite.cover_image }}' }">
+
+  <!-- Minimal Breadcrumb -->
+  <div class="flex items-center gap-2 text-xs text-stone-400 mb-8 font-light">
+    <a href="{% url 'home' %}" class="hover:text-stone-900 transition-colors">Home</a>
+    <span>/</span>
+    <a href="{% url 'home' %}#suites" class="hover:text-stone-900 transition-colors">Suites</a>
+    <span>/</span>
+    <span class="text-stone-800 font-medium">{{ suite.title }}</span>
+  </div>
+
+  <!-- Suite Title & Key Rate Header -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-stone-200/80">
+    <div>
+      <div class="flex items-center gap-3 mb-2.5">
+        <span class="text-[10px] uppercase font-semibold tracking-widest text-stone-500 bg-stone-100 px-3 py-1 rounded-full">
+          {{ suite.unit_type }}
+        </span>
+        {% if suite.badge %}
+          <span class="text-[10px] font-semibold tracking-wider uppercase text-stone-900 bg-stone-200/70 px-3 py-1 rounded-full">
+            {{ suite.badge }}
+          </span>
+        {% endif %}
+      </div>
+      <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-900 tracking-tight">{{ suite.title }}</h1>
+      <p class="text-stone-500 text-sm mt-2 max-w-2xl font-light leading-relaxed">{{ suite.short_description }}</p>
+    </div>
+
+    <!-- Direct Pricing Callout -->
+    <div class="text-left md:text-right">
+      <div class="text-xs uppercase tracking-widest text-stone-400 font-medium">Direct Rate</div>
+      <div class="text-3xl font-serif text-stone-900 font-normal">
+        GH₵{{ suite.nightly_rate|floatformat:0 }} <span class="text-xs text-stone-500 font-sans font-light">/ night</span>
+      </div>
+      <div class="text-[11px] text-stone-500 font-light mt-0.5">Direct host booking · Zero service fees</div>
+    </div>
+  </div>
+
+  <!-- Minimal Image Showcase -->
+  <div class="space-y-4 mb-16">
+    <!-- Active Large Image -->
+    <div class="aspect-[16/9] lg:aspect-[21/9] rounded-3xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-sm relative">
+      <img :src="activeImage" alt="{{ suite.title }}" class="w-full h-full object-cover transition-all duration-500">
+    </div>
+
+    <!-- Thumbnails row if extra gallery images exist -->
+    <div class="flex gap-3 overflow-x-auto pb-2">
+      <button @click="activeImage = '{{ suite.cover_image }}'" class="w-24 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all" :class="activeImage === '{{ suite.cover_image }}' ? 'border-stone-900 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'">
+        <img src="{{ suite.cover_image }}" alt="Cover" class="w-full h-full object-cover">
+      </button>
+
+      {% for g in suite.gallery_images.all %}
+        <button @click="activeImage = '{{ g.image_url }}'" class="w-24 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all" :class="activeImage === '{{ g.image_url }}' ? 'border-stone-900 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'">
+          <img src="{{ g.image_url }}" alt="{{ g.caption }}" class="w-full h-full object-cover">
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Main Grid: Suite Specs & Description vs Sticky Inquiry Sidebar -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+    
+    <!-- Left Column: Specs & Editorial Description (7 Cols) -->
+    <div class="lg:col-span-7 space-y-12">
+      
+      <!-- Key Specs (Minimal Editorial Strip) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-stone-200/80 text-center">
+        <div>
+          <span class="block text-stone-400 text-[10px] uppercase tracking-widest font-semibold">Capacity</span>
+          <span class="font-medium text-sm text-stone-900 mt-1 block">Up to {{ suite.max_guests }} Guests</span>
+        </div>
+        <div>
+          <span class="block text-stone-400 text-[10px] uppercase tracking-widest font-semibold">Bedrooms</span>
+          <span class="font-medium text-sm text-stone-900 mt-1 block">{{ suite.bedrooms }} Bedroom</span>
+        </div>
+        <div>
+          <span class="block text-stone-400 text-[10px] uppercase tracking-widest font-semibold">Bathrooms</span>
+          <span class="font-medium text-sm text-stone-900 mt-1 block">{{ suite.bathrooms }} Private Bath</span>
+        </div>
+        <div>
+          <span class="block text-stone-400 text-[10px] uppercase tracking-widest font-semibold">Area</span>
+          <span class="font-medium text-sm text-stone-900 mt-1 block">{{ suite.size_sqm }} m²</span>
+        </div>
+      </div>
+
+      <!-- About This Suite -->
+      <div class="space-y-4">
+        <h3 class="font-serif text-2xl font-normal text-stone-900">About the Residence</h3>
+        <div class="text-stone-600 text-sm leading-relaxed space-y-4 whitespace-pre-line font-light">
+          {{ suite.description }}
+        </div>
+      </div>
+
+      <!-- Included Amenities for this Suite -->
+      <div class="space-y-5 pt-4">
+        <h3 class="font-serif text-2xl font-normal text-stone-900">Suite Features</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {% for am in suite.amenities.all %}
+            <div class="flex items-center gap-2.5 bg-white border border-stone-200/80 p-3 rounded-xl text-xs text-stone-700">
+              <span class="text-stone-900 font-medium">✓</span>
+              <span>{{ am.name }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- House Policies -->
+      <div class="bg-stone-50 border border-stone-200/80 p-6 rounded-2xl space-y-3 text-xs text-stone-600 font-light">
+        <h4 class="text-stone-900 font-medium text-xs uppercase tracking-wider">Stay Policies</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div>Check-in: <strong class="text-stone-900 font-medium">{{ property.check_in_time }}</strong></div>
+          <div>Check-out: <strong class="text-stone-900 font-medium">{{ property.check_out_time }}</strong></div>
+          <div>Non-smoking residence interior</div>
+          <div>Quiet hours: 10:00 PM – 8:00 AM</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Sticky Booking & Direct Concierge (5 Cols) -->
+    <div class="lg:col-span-5">
+      <div class="sticky top-28 bg-white border border-stone-200 p-8 rounded-3xl shadow-sm space-y-6">
+        
+        <div class="border-b border-stone-100 pb-5">
+          <div class="flex justify-between items-baseline">
+            <span class="text-2xl font-serif font-normal text-stone-900">GH₵{{ suite.nightly_rate|floatformat:0 }}</span>
+            <span class="text-xs text-stone-500 font-light">per night (all-inclusive)</span>
+          </div>
+          <p class="text-xs text-stone-500 font-light mt-1">Direct booking guarantee with on-site host</p>
+        </div>
+
+        <!-- Quick Direct Booking Options -->
+        <div class="space-y-3">
+          <a href="https://wa.me/{{ property.whatsapp_number }}?text=Hello%20{{ property.name }},%20I%20would%20like%20to%20reserve%20the%20{{ suite.title|urlencode }}." target="_blank" class="w-full inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-stone-50 font-medium py-3.5 px-4 rounded-full text-xs uppercase tracking-wider transition-colors">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            <span>Inquire on WhatsApp</span>
+          </a>
+
+          <a href="tel:{{ property.phone_number }}" class="w-full inline-flex items-center justify-center gap-2 border border-stone-200 hover:border-stone-400 text-stone-800 font-medium py-3 px-4 rounded-full text-xs uppercase tracking-wider transition-colors">
+            <span>Call Host: {{ property.phone_number }}</span>
+          </a>
+        </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-stone-100"></div>
+          <span class="flex-shrink mx-3 text-stone-400 text-[10px] uppercase tracking-widest font-semibold">Or Submit Form</span>
+          <div class="flex-grow border-t border-stone-100"></div>
+        </div>
+
+        <!-- Quick Request Form -->
+        <form method="POST" action="{% url 'inquiry_submit' %}" class="space-y-3.5 text-left">
+          {% csrf_token %}
+          <input type="hidden" name="preferred_unit" value="{{ suite.id }}">
+
+          <div>
+            <label class="block text-[11px] font-medium text-stone-700 mb-1">Your Full Name *</label>
+            <input type="text" name="guest_name" required placeholder="Full Name" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:border-stone-900 transition-colors">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-stone-700 mb-1">Phone / WhatsApp Number *</label>
+            <input type="tel" name="guest_phone" required placeholder="Phone number" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:border-stone-900 transition-colors">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-stone-700 mb-1">Check-in *</label>
+              <input type="date" name="check_in_date" required class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:border-stone-900 transition-colors">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-stone-700 mb-1">Check-out *</label>
+              <input type="date" name="check_out_date" required class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:border-stone-900 transition-colors">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-stone-700 mb-1">Guests *</label>
+            <select name="number_of_guests" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-xs text-stone-900 focus:outline-none focus:border-stone-900 transition-colors">
+              <option value="1">1 Guest</option>
+              <option value="2" selected>2 Guests</option>
+              <option value="3">3 Guests</option>
+              <option value="4">4 Guests</option>
+              <option value="5">5+ Guests</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-stone-700 mb-1">Special Notes (Optional)</label>
+            <textarea name="special_notes" rows="2" placeholder="Arrival times, requests..." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-900 focus:outline-none focus:border-stone-900 transition-colors resize-none"></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-stone-900 hover:bg-stone-800 text-stone-50 font-medium py-3 rounded-full text-xs uppercase tracking-wider transition-colors">
+            Send Inquiry
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
